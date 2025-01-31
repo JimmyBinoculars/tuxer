@@ -7,6 +7,13 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
+# Assemble x11.asm to x11.o
+nasm -f elf -o build/x11.o src/x11.asm
+if [ $? -ne 0 ]; then
+    echo "Error assembling x11.asm"
+    exit 1
+fi
+
 # Assemble display.asm to display.o
 nasm -f elf64 -o build/display.o src/display.asm
 if [ $? -ne 0 ]; then

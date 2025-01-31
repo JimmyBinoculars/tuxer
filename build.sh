@@ -1,5 +1,5 @@
 #!/bin/bash
-# Assemble everythin in 64 bit and make sure it returns error when compilation failed
+# Assemble everything in 64-bit and make sure it returns error when compilation failed
 
 # Assemble helloWorld.asm to hello.o
 nasm -f elf64 -o build/hello.o src/helloWorld.asm
@@ -30,7 +30,7 @@ if [ $? -ne 0 ]; then
 fi
 
 # Link the object files to create the final executable
-ld -o build/main build/main.o build/display.o build/hello.o
+ld -o build/main build/main.o build/display.o build/hello.o build/x11.o -L./lib -lX11
 if [ $? -ne 0 ]; then
     echo "Error linking object files"
     exit 1

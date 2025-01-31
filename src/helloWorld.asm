@@ -9,9 +9,10 @@ hello:
     mov rdx, msglen
     syscall
 
-    mov rax, 60
-    mov rdi, 0
-    syscall
+    ; How tf did I not notice that the program exits here
+;    mov rax, 60
+;    mov rdi, 0
+;    syscall
 
 section .rodata
     msg: db "Hello, World!", 0

@@ -5,3 +5,4 @@ section .text
 
 display:
     call x11
+    ret

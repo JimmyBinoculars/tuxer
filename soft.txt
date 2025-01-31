@@ -1,0 +1,3 @@
+nasm
+ld
+libx11-dev

@@ -1,52 +1,62 @@
 section .data
-    titleString db 'My X11 Browser', 0   ; Window title
-    textString db 'Hello, World!', 0      ; Text to display
+    display_name db ":0", 0               ; Display name (":0" refers to the default display)
+    window_title db "Hello", 0             ; Title of the window
 
 section .bss
-    display resq 1                        ; Store the display pointer
-    windowID resq 1                       ; Store window ID
+    display resq 1                         ; To store the display pointer
+    window resq 1                          ; To store the window pointer
+    event resb 256                         ; Buffer for the event
 
 section .text
+    extern XOpenDisplay, XCreateSimpleWindow, XStoreName, XMapWindow, XNextEvent, XCloseDisplay
+
     global x11init
 
 x11init:
-    ; Open X11 Display
-    mov rdi, 0                 ; NULL for default display
-    syscall                    ; mmap or dlsym to get XOpenDisplay address
-    mov [display], rdi         ; Store the display pointer
+    ; Open the display
+    mov rdi, display_name                 ; Display name
+    call XOpenDisplay                     ; Call XOpenDisplay
 
-    ; Create Window
-    mov rdi, [display]         ; Display pointer
-    mov rsi, windowAttributes  ; Set up window attributes (size, etc.)
-    mov rdx, windowSize        ; Size (width, height)
-    syscall                    ; Call XCreateWindow
-    mov [windowID], rdi        ; Store window ID
+    ; Store the display pointer
+    mov [display], rax
 
-    ; Map Window
-    mov rdi, [display]         ; Display pointer
-    mov rsi, [windowID]        ; Window ID
-    syscall                    ; Call XMapWindow
+    ; Create the window
+    mov rdi, [display]                    ; Display pointer
+    mov rsi, 0                             ; Window parent (None, 0)
+    mov rdx, 200                           ; Window width
+    mov rcx, 200                           ; Window height
+    call XCreateSimpleWindow              ; Call XCreateSimpleWindow
 
-    ; Set Window Title
-    mov rdi, [display]         ; Display pointer
-    mov rsi, [windowID]        ; Window ID
-    mov rdx, titleString       ; Title
-    syscall                    ; Call XStoreName
+    ; Store the window pointer
+    mov [window], rax
 
-    ; Draw Text
-    mov rdi, [display]         ; Display pointer
-    mov rsi, [windowID]        ; Window ID
-    mov rdx, fontSize          ; Font size
-    mov rcx, textString        ; Text to draw
-    syscall                    ; Call XDrawString
+    ; Set the window title
+    mov rdi, [display]                    ; Display pointer
+    mov rsi, [window]                     ; Window pointer
+    mov rdx, window_title                 ; Title
+    call XStoreName                       ; Call XStoreName
 
-    ; Event loop (basic)
-event_loop:
-    mov rdi, [display]         ; Display pointer
-    mov rsi, eventStruct       ; Event structure
-    syscall                    ; Call XNextEvent (wait for input)
-    ; Process event here...
+    ; Map the window (show it)
+    mov rdi, [display]                    ; Display pointer
+    mov rsi, [window]                     ; Window pointer
+    call XMapWindow                       ; Call XMapWindow
 
-    ; Close Display (optional at the end)
-    mov rdi, [display]         ; Display pointer
-    syscall                    ; Call XCloseDisplay
+wait_event:
+    ; Wait for an event (like window close)
+    mov rdi, [display]                    ; Display pointer
+    mov rsi, event                        ; Event buffer
+    call XNextEvent                        ; Call XNextEvent
+
+    ; Check for close event (for simplicity, assume event type 33 is close)
+    movzx rax, byte [event]
+    cmp rax, 33
+    je cleanup
+
+    ; Repeat waiting for events
+    jmp wait_event
+
+cleanup:
+    ; Clean up and close the display
+    mov rdi, [display]                    ; Display pointer
+    call XCloseDisplay                    ; Call XCloseDisplay
+    ret

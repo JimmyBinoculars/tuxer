@@ -1,7 +1,7 @@
-extern x11init
+extern x11
+global display
 
 section .text
-    global display
 
 display:
-    call x11init
+    call x11

@@ -1,64 +1,58 @@
-extern hello
-global x11init
-
 section .data
-    display_name db ":0", 0               ; Display name (":0" refers to the default display)
-    window_title db "Hello", 0             ; Title of the window
-
+    window_title db 'Hello World', 0   ; Window title
+    
 section .bss
-    display resq 1                         ; To store the display pointer
-    window resq 1                          ; To store the window pointer
-    event resb 256                         ; Buffer for the event
+    display resq 1
+    window  resq 1
+    event   resb 128
 
 section .text
+    global x11
     extern XOpenDisplay, XCreateSimpleWindow, XStoreName, XMapWindow, XNextEvent, XCloseDisplay
 
-x11init:
-    ;call hello                           ;Only use for tests
-    ; Open the display
-    mov rdi, display_name                 ; Display name
-    call XOpenDisplay                     ; Call XOpenDisplay
+x11:
+    ; Open the display (this is equivalent to XOpenDisplay(NULL) in C)
+    mov rdi, 0                ; NULL argument for XOpenDisplay
+    call XOpenDisplay
+    mov [display], rax        ; Store the display pointer
+    
+    ; Create a simple window (Display, Parent Window, X, Y, Width, Height, Border, Background)
+    mov rdi, [display]        ; Display pointer
+    mov rsi, 0                ; Parent window (root window)
+    mov rdx, 10               ; X position
+    mov rcx, 10               ; Y position
+    mov r8, 300               ; Width
+    mov r9, 200               ; Height
+    mov r10, 1                ; Border width
+    mov r11, 0xFFFFFF         ; Background color (white)
+    call XCreateSimpleWindow
+    mov [window], rax         ; Store the window pointer
+    
+    ; Set the window title (XStoreName)
+    mov rdi, [display]        ; Display pointer
+    mov rsi, [window]         ; Window pointer
+    mov rdx, window_title     ; Title
+    call XStoreName
+    
+    ; Map the window to make it visible (XMapWindow)
+    mov rdi, [display]        ; Display pointer
+    mov rsi, [window]         ; Window pointer
+    call XMapWindow
+    
+    ; Event loop: wait for events
+event_loop:
+    mov rdi, [display]        ; Display pointer
+    mov rsi, event            ; Event buffer
+    call XNextEvent
+    
+    ; Check for the 'close' event (this is a simplified example)
+    ; Normally you would need more sophisticated event handling
+    ; to handle window close and other events.
+    
+    ; For this example, we'll just loop indefinitely.
+    jmp event_loop
 
-    ; Store the display pointer
-    mov [display], rax
-
-    ; Create the window
-    mov rdi, [display]                    ; Display pointer
-    mov rsi, 0                             ; Window parent (None, 0)
-    mov rdx, 200                           ; Window width
-    mov rcx, 200                           ; Window height
-    call XCreateSimpleWindow              ; Call XCreateSimpleWindow
-
-    ; Store the window pointer
-    mov [window], rax
-
-    ; Set the window title
-    mov rdi, [display]                    ; Display pointer
-    mov rsi, [window]                     ; Window pointer
-    mov rdx, window_title                 ; Title
-    call XStoreName                       ; Call XStoreName
-
-    ; Map the window (show it)
-    mov rdi, [display]                    ; Display pointer
-    mov rsi, [window]                     ; Window pointer
-    call XMapWindow                       ; Call XMapWindow
-
-wait_event:
-    ; Wait for an event (like window close)
-    mov rdi, [display]                    ; Display pointer
-    mov rsi, event                        ; Event buffer
-    call XNextEvent                        ; Call XNextEvent
-
-    ; Check for close event (for simplicity, assume event type 33 is close)
-    movzx rax, byte [event]
-    cmp rax, 33
-    je cleanup
-
-    ; Repeat waiting for events
-    jmp wait_event
-
-cleanup:
-    ; Clean up and close the display
-    mov rdi, [display]                    ; Display pointer
-    call XCloseDisplay                    ; Call XCloseDisplay
-    ret
+    ; Close the display (clean up)
+    ; This would be done after the event loop ends (on program exit)
+    mov rdi, [display]        ; Display pointer
+    call XCloseDisplay

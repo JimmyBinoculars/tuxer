@@ -1,6 +1,6 @@
 section .data
     window_title db 'Hello World', 0   ; Window title
-    
+
 section .bss
     display resq 1
     window  resq 1
@@ -14,6 +14,9 @@ x11:
     ; Open the display (this is equivalent to XOpenDisplay(NULL) in C)
     mov rdi, 0                ; NULL argument for XOpenDisplay
     call XOpenDisplay
+    test rax, rax             ; Check if the display is NULL
+    jz error_exit             ; If NULL, jump to error_exit
+
     mov [display], rax        ; Store the display pointer
     
     ; Create a simple window (Display, Parent Window, X, Y, Width, Height, Border, Background)
@@ -27,6 +30,10 @@ x11:
     mov r11, 0xFFFFFF         ; Background color (white)
     call XCreateSimpleWindow
     mov [window], rax         ; Store the window pointer
+
+    ; Check if window creation was successful
+    test rax, rax             ; Check if the window pointer is NULL
+    jz error_exit             ; If NULL, jump to error_exit
     
     ; Set the window title (XStoreName)
     mov rdi, [display]        ; Display pointer
@@ -52,7 +59,9 @@ event_loop:
     ; For this example, we'll just loop indefinitely.
     jmp event_loop
 
-    ; Close the display (clean up)
-    ; This would be done after the event loop ends (on program exit)
-    mov rdi, [display]        ; Display pointer
-    call XCloseDisplay
+error_exit:
+    ; Exit cleanly if we encountered an error (e.g., XOpenDisplay failed)
+    ; In this example, we’ll just exit with a return code
+    mov rax, 60               ; Syscall number for exit
+    xor rdi, rdi              ; Return code 0
+    syscall

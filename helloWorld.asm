@@ -13,3 +13,4 @@ hello:
 
 section .rodata
     msg: db "Hello, World!"
+    msglen: equ $ - msg

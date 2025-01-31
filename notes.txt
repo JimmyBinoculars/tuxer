@@ -1,0 +1,7 @@
+required programs:
+    nasm
+    ld
+    libx11-dev
+
+useful commands:
+    use ldd for checking if a file is dynamic

@@ -1,7 +1,7 @@
-extern x11init
+extern hello
 
 section .text
     global display
 
 display:
-    call x11init
+    call hello

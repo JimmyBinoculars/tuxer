@@ -1,8 +1,8 @@
-global _start
+global hello
 
 section .text
 
-_start:
+hello:
     mov rax, 1
     mov rdi, 1
     mov rsi, msg

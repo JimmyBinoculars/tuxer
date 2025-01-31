@@ -1,3 +1,6 @@
+extern hello
+global x11init
+
 section .data
     display_name db ":0", 0               ; Display name (":0" refers to the default display)
     window_title db "Hello", 0             ; Title of the window
@@ -10,9 +13,8 @@ section .bss
 section .text
     extern XOpenDisplay, XCreateSimpleWindow, XStoreName, XMapWindow, XNextEvent, XCloseDisplay
 
-    global x11init
-
 x11init:
+    ;call hello                           ;Only use for tests
     ; Open the display
     mov rdi, display_name                 ; Display name
     call XOpenDisplay                     ; Call XOpenDisplay

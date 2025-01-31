@@ -20,7 +20,7 @@ jobs:
       - name: Install dependencies (ld and nasm)
         run: |
           sudo apt update
-          sudo apt install -y binutils nasm
+          sudo apt install -y binutils nasm libx11-dev
 
       - name: Run build script
         run: |

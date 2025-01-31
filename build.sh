@@ -37,7 +37,7 @@ if [ $? -ne 0 ]; then
 fi
 
 # Link the object files to create the final executable using the local static libX11.a
-ld -o build/main build/main.o build/display.o build/hello.o build/x11.o -L./lib -lX11 -static -dynamic-linker /lib64/ld-linux-x86-64.so.2
+gcc -o build/main build/main.o build/display.o build/hello.o build/x11.o -static -nostartfiles -L./lib -lX11 -lxcb -lXau -lXdmcp -lpthread
 if [ $? -ne 0 ]; then
     echo "Error linking object files"
     exit 1

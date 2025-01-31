@@ -17,5 +17,5 @@ hello:
     ;syscall
 
 section .rodata
-    msg: db "Hello, World", 0x0A,0
+    msg: db "Hello, World!", 0x0A,0
     msglen: equ $ - msg

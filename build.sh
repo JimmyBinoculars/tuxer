@@ -1,4 +1,5 @@
 #!/bin/bash
+# Assemble everythin in 64 bit and make sure it returns error when compilation failed
 
 # Assemble helloWorld.asm to hello.o
 nasm -f elf64 -o build/hello.o src/helloWorld.asm
@@ -8,7 +9,7 @@ if [ $? -ne 0 ]; then
 fi
 
 # Assemble x11.asm to x11.o
-nasm -f elf -o build/x11.o src/x11.asm
+nasm -f elf64 -o build/x11.o src/x11.asm
 if [ $? -ne 0 ]; then
     echo "Error assembling x11.asm"
     exit 1

@@ -1,3 +1,4 @@
+bits 64
 extern display
 
 section .text

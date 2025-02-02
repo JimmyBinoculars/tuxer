@@ -1,3 +1,4 @@
+bits 64
 extern x11
 global display
 

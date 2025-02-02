@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - linux
   pull_request:
     branches:
       - main
@@ -15,6 +16,11 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+
+      - name: Install dependencies (ld, nasm & binitils)
+        run: |
+          sudo apt update
+          sudo apt install -y binutils nasm libx11-dev
 
       - name: Run build script
         run: |

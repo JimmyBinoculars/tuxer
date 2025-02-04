@@ -11,3 +11,5 @@ sudo apt update
 sudo apt install binutils nasm libx11-dev
 ```
 Then you are ready to begin programming!
+
+Note: Currently development is halted on this project while I write the [graphics libraries](https://github.com/LemmaAlliance/tuxer-ui) myself, feel free to contribute there.
